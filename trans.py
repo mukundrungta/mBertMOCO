@@ -12,17 +12,17 @@ from sklearn.metrics import roc_auc_score
 import argparse
 import csv
 from transformers import BertTokenizer,BertForSequenceClassification
-path_to_biobert = './pretrained'
+model_name = 'bert-base-multilingual-cased'
 usemoco=True
 total_classes = 3
-if usemoco:
+def get_model(path):
     model = BertForSequenceClassification.from_pretrained(
         path_to_biobert,  # Use the 12-layer BERT model, with an unc
         num_labels=1000,  # The number of output labels--2 for binary classify# You can increase this for mult
         output_attentions=False,  # Whether the model returns attention
 	output_hidden_states=False,  # Whether the model returns all hidden-states
 	)
-    checkpoint = torch.load('./trained_models/moco1.tar')
+    checkpoint = torch.load(path)
     print(checkpoint.keys())
     print(checkpoint['arch'])
     state_dict = checkpoint['state_dict']
@@ -47,5 +47,6 @@ if usemoco:
     model.load_state_dict(checkpoint['state_dict'])
     fc_features = model.classifier.in_features
     model.classifier = nn.Linear(fc_features, total_classes)
-    torch.save(model.state_dict(), "./moco_model/moco.p")
+    torch.save(model.state_dict(), path+"./moco_enq_model/moco.p")
     print('finished')
+    return model
