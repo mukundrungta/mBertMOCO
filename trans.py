@@ -17,12 +17,12 @@ usemoco=True
 total_classes = 3
 def get_model(path):
     model = BertForSequenceClassification.from_pretrained(
-        path_to_biobert,  # Use the 12-layer BERT model, with an unc
-        num_labels=1000,  # The number of output labels--2 for binary classify# You can increase this for mult
+        model_name,  # Use the 12-layer BERT model, with an unc
+        num_labels=128,  # The number of output labels--2 for binary classify# You can increase this for mult
         output_attentions=False,  # Whether the model returns attention
 	output_hidden_states=False,  # Whether the model returns all hidden-states
 	)
-    checkpoint = torch.load(path)
+    checkpoint = torch.load(path+'moco1.tar')
     print(checkpoint.keys())
     print(checkpoint['arch'])
     state_dict = checkpoint['state_dict']
@@ -47,6 +47,6 @@ def get_model(path):
     model.load_state_dict(checkpoint['state_dict'])
     fc_features = model.classifier.in_features
     model.classifier = nn.Linear(fc_features, total_classes)
-    torch.save(model.state_dict(), path+"./moco_enq_model/moco.p")
+    torch.save(model.state_dict(), path+"moco_enq_model/moco.p")
     print('finished')
     return model
